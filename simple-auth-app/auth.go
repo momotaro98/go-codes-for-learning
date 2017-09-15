@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/markbates/goth/gothic"
 )
@@ -30,51 +29,32 @@ func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	segs := strings.Split(r.URL.Path, "/")
-	action := segs[2]
-	// provider := segs[3]
-	switch action {
-	case "login":
+func providerHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r)
+	gothic.BeginAuthHandler(w, r)
+}
 
-		// goth goth goth
-		// try to get the user without re-authenticating
-		if gothUser, err := gothic.CompleteUserAuth(w, r); err == nil {
-			fmt.Println(gothUser)
-		} else {
-			gothic.BeginAuthHandler(w, r)
-		}
-		// goth goth goth
-
-	case "callback":
-
-		// goth goth goth
-		user, err := gothic.CompleteUserAuth(w, r)
-		if err != nil {
-			fmt.Fprintln(w, r)
-			return
-		}
-		fmt.Println(user)
-		// goth goth goth
-
-		// データをCookieにしこむ
-		/*
-			authCookieValue := objx.New(map[string]interface{}{
-				"userid":     chatUser.UniqueID(),
-				"name":       user.Name(),
-				"avatar_url": avatarURL,
-			}).MustBase64()
-			http.SetCookie(w, &http.Cookie{
-				Name:  "auth",
-				Value: authCookieValue,
-				Path:  "/"})
-		*/
-		w.Header()["Location"] = []string{"/"}
-		w.WriteHeader(http.StatusTemporaryRedirect)
-	default:
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, "アクション%sには非対応です", action)
+func callbackHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := gothic.CompleteUserAuth(w, r)
+	if err != nil {
+		return
 	}
+	fmt.Println(user)
+
+	// データをCookieにしこむ
+	/*
+		authCookieValue := objx.New(map[string]interface{}{
+			"userid":     chatUser.UniqueID(),
+			"name":       user.Name(),
+			"avatar_url": avatarURL,
+		}).MustBase64()
+		http.SetCookie(w, &http.Cookie{
+			Name:  "auth",
+			Value: authCookieValue,
+			Path:  "/"})
+	*/
+	w.Header()["Location"] = []string{"/"}
+	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
