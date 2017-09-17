@@ -19,7 +19,7 @@ type authHandler struct {
 
 func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if cookie, err := r.Cookie("auth"); err == http.ErrNoCookie || cookie.Value == "" {
-		// 未承認時はログイン画面へ返す
+		// 未承認時はログイン画面へリダイレクト
 		w.Header().Set("Location", "/login")
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	} else {
@@ -29,13 +29,14 @@ func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func callbackHandler(w http.ResponseWriter, r *http.Request) {
+	// 外部サービスからの認証結果を判定
 	user, err := gothic.CompleteUserAuth(w, r)
 	if err != nil {
 		fmt.Fprintln(w, err)
 		return
 	}
 
-	// アプリ用データをCookieにしこむ
+	// 外部サービスから取得した情報をアプリ用データとしてCookieにしこむ
 	authCookieValue := objx.New(map[string]interface{}{
 		"name":       user.Name,
 		"avatar_url": user.AvatarURL,
@@ -46,6 +47,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		Path:  "/",
 	})
 
+	// メイン画面へリダイレクト
 	w.Header()["Location"] = []string{"/"}
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }

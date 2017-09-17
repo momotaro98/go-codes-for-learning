@@ -18,9 +18,11 @@ import (
 
 func init() {
 	/*
+		// gothで利用するCookieの設定を上書きする場合
 		store := sessions.NewCookieStore([]byte(os.Getenv("SESSION_SECRET")))
-		store.MaxAge(86400 * 60)
-		gothic.Store = store
+		store.MaxAge(86400 * 60) // セッション期限の設定(60日) デフォルトでは30日
+		store.Options.Secure = true // Cookieのセキュア設定 デフォルトではfalse
+		gothic.Store = store // 上書きする
 	*/
 
 	goth.UseProviders(
@@ -42,6 +44,7 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	data := make(map[string]interface{})
 
+	// アプリ用Cookieからユーザー情報を取得する
 	if authCookie, err := r.Cookie("auth"); err == nil {
 		data["UserData"] = objx.MustFromBase64(authCookie.Value)
 	}
@@ -50,7 +53,7 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// patを利用しルート設定
+	// patを使ってルーティング設定
 	p := pat.New()
 	p.Get("/auth/{provider}/callback", callbackHandler)
 	p.Get("/auth/{provider}", gothic.BeginAuthHandler)
