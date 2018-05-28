@@ -1,0 +1,115 @@
+# 特集2 Goによる並行処理 ~複雑な処理をスイスイ書こう！~
+
+## 第2章 Goでの並行処理
+
+### goroutineの特徴
+
+> goroutineが実行される裏ではGoのランタイムが起動したいくつかのスレッドがあり、空いているスレッドに順にgoroutineを乗せて処理を進める、タイムシェア方式とでも呼べる実装になっています。
+
+### スレッドとの違い
+
+#### channelによるデータの送受信
+
+> channelを受け取ったgoroutineが現在の「持ち主」であり、そのgoroutineだけがchannelに対して操作を行える
+> この実装の場合、明示的な排他制御は必要なくなります。
+
+#### IDを持たない
+
+> goroutineはIDを持ちません。固有のgoroutineを、スレッドやプロセスのようにそのIDだけでは判別できません。
+
+> IDが指定できないため、シグナルのようなしくみで外部からgoroutineを指定して、その動作に強制的に影響を及ぼすことはできません。そのためgoroutineには、ほぼ必ず明示的に停止するためのしくみを用意する必要があります。
+
+## channelによるデータ受け渡し
+
+### channelの基本
+
+[code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/channel-basic.go)
+
+### ブロックせずにchannel処理を行う
+
+> 次の例では、3つのchannelの中から読み込み可能なchannelがあればそれを読み込みます。すべてのchannelがデータ到着待ちでブロックするのであれば、defaultのケースが実行されます。
+
+```
+for {
+    select {
+    case value := <-ch1:
+        ...
+    case value := <-ch2:
+        ...
+    case value := <-ch3:
+        ...
+    default:
+        fmt.Println("nothing to do!")
+    }
+}
+```
+
+> なお、nilなchannelに対して読み込みを行うと必ずブロックします。selectと合わせて、特定のselectのケースを無効にしたい場合などに便利です。
+
+```
+for {
+    select {
+    case <-ch1:
+      ...
+    case <-ch2:
+      // ここでch1をnilにすると、上記のcaseはブロックされ実行されない
+      ch1 = nil
+      ...
+    }
+}
+```
+
+### 閉じたchannelの挙動
+
+> channelに対する**書き込み**が必要なくなった時点で、close関数を使ってchannelを閉じることができます。閉じられたchannelへの書き込みを行うと例外が起こりますので注意してください。
+
+> channelを閉じると、読み込み待ちでブロックしていたすべてのgoroutineのブロック状態が終わります。この性質を使えば、goroutineが終了したことを伝えたり、複数のgoroutineを一斉に通知したりできます。
+
+```
+ch := make(chan struct{})
+for i := 0; i < 10; i++ {
+    go func() {
+        <-ch // waiting
+        ...
+    }()
+}
+
+time.AfterFunc(5*time.Second, func() {
+    close(ch) // above blocking(<-ch) will be released and process goes next
+})
+```
+
+> また、閉じられたchannelから読み込みを行うと、それまですでに書き込まれた値が通常どおり返ってきます。ほかに読み込む値がない状態でさらに読み込みを行うと、channelが返すべき型のゼロ値が即座に返ってきます。
+
+[code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/closed-channel-behavior.go)
+
+### Condで複数の相手に状態の変更を通知する
+
+> 状態が変わったことを通知するコンディション変数は、Goではsync.Condを使って実装できます。
+
+[code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/cond-example.go)
+
+Description of `Cond` struct type
+
+```
+type Cond struct {
+
+        // L is held while observing or changing the condition
+        L Locker
+
+        // Has unexported fields.
+}
+    Cond implements a condition variable, a rendezvous point for goroutines
+    waiting for or announcing the occurrence of an event.
+
+    Each Cond has an associated Locker L (often a *Mutex or *RWMutex), which
+    must be held when changing the condition and when calling the Wait method.
+
+    A Cond must not be copied after first use.
+
+
+func NewCond(l Locker) *Cond
+func (c *Cond) Broadcast()
+func (c *Cond) Signal()
+func (c *Cond) Wait()
+```
