@@ -185,3 +185,11 @@ func FanoutDispatcher(out chan FanoutTask) {
     }
 }
 ```
+
+### ジェネレータで連番の生成
+
+> プログラム内で利用するIDに連番を生成するケースは頻繁にあります。他の言語では、同時に複数の呼び出し元がある場合に連番が正しく生成されていることを保証するには明示的な排他制御が必要ですが、Goであれば安全に連番を生成できます。
+
+[code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/generate-series.go)
+
+> この例のポイントは、channelへの書き込み・読み込みは複数goroutine間で安全なため、一切の明示的な排他制御をせずに正しく連番を扱えることです。
