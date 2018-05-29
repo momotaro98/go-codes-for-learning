@@ -1,4 +1,4 @@
-# 特集2 Goによる並行処理 ~複雑な処理をスイスイ書こう！~
+# 特集2 Goによる並行処理 〜複雑な処理をスイスイ書こう！〜
 
 ## 第2章 Goでの並行処理
 
@@ -19,13 +19,13 @@
 
 > IDが指定できないため、シグナルのようなしくみで外部からgoroutineを指定して、その動作に強制的に影響を及ぼすことはできません。そのためgoroutineには、ほぼ必ず明示的に停止するためのしくみを用意する必要があります。
 
-## channelによるデータ受け渡し
+## channelによるデータ受け渡し
 
-### channelの基本
+### channelの基本
 
 [code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/channel-basic.go)
 
-### ブロックせずにchannel処理を行う
+### ブロックせずにchannel処理を行う
 
 > 次の例では、3つのchannelの中から読み込み可能なchannelがあればそれを読み込みます。すべてのchannelがデータ到着待ちでブロックするのであれば、defaultのケースが実行されます。
 
@@ -83,9 +83,9 @@ time.AfterFunc(5*time.Second, func() {
 
 [code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/closed-channel-behavior.go)
 
-### Condで複数の相手に状態の変更を通知する
+### Condで複数の相手に状態の変更を通知する
 
-> 状態が変わったことを通知するコンディション変数は、Goではsync.Condを使って実装できます。
+> 状態が変わったことを通知するコンディション変数は、Goではsync.Condを使って実装できます。
 
 [code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/cond-example.go)
 
@@ -115,8 +115,8 @@ func (c *Cond) Wait()
 ```
 
 ## 第3章 並行処理の実装パターン
-
-### セマフォで同時実行数の制御
+
+### セマフォで同時実行数の制御
 
 > Mutexは上限数が1のセマフォと考えることもできます。
 > Goにはセマフォとう名前のデータ型は存在しませんが、セマフォに相当するものとして、バッファ付きchannelを利用します。
@@ -190,6 +190,18 @@ func FanoutDispatcher(out chan FanoutTask) {
 
 > プログラム内で利用するIDに連番を生成するケースは頻繁にあります。他の言語では、同時に複数の呼び出し元がある場合に連番が正しく生成されていることを保証するには明示的な排他制御が必要ですが、Goであれば安全に連番を生成できます。
 
-[code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/generate-series.go)
+[code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/generate-series.go)
 
 > この例のポイントは、channelへの書き込み・読み込みは複数goroutine間で安全なため、一切の明示的な排他制御をせずに正しく連番を扱えることです。
+
+### time.Timerでタイムアウト処理
+
+> N秒後に何らかの処理を行いたい場合は、time.Timerオブジェクトを作成します。
+
+[code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/timeTimer.go)
+
+### time.Tickerで定期的な処理
+
+> N秒ごとに定期的に処理を行いたい場合もあります。
+
+[code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/timeTicker.go)
