@@ -113,3 +113,75 @@ func (c *Cond) Broadcast()
 func (c *Cond) Signal()
 func (c *Cond) Wait()
 ```
+
+## 第3章 並行処理の実装パターン
+
+### セマフォで同時実行数の制御
+
+> Mutexは上限数が1のセマフォと考えることもできます。
+> Goにはセマフォとう名前のデータ型は存在しませんが、セマフォに相当するものとして、バッファ付きchannelを利用します。
+> 次の例では、バッファ付きchannelの特性を使って同時にhttp.Getを実行可能なgoroutineの数を5個に制限しています。
+
+```
+func FetchURL(sem chan struct {}, url string) {
+    sem<-struct{}{} // Block when over 10 requests come
+    defer func() { <-sem }() // Release sem when http.Get request process done
+
+    res, err := http.Get(url)
+    ...
+}
+
+func ExampleSemaphore() {
+    sem := make(chan struct{}, 10)
+    urls := []string{ ... } // URL list
+    var wg sync.WaitGroup
+    for _, u := range urls {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            FetchURL(sem, u) // request to URL with new goroutine
+        }()
+    }
+    wg.Wait()
+}
+```
+
+### ワーカにタスクをfan-outさせる
+
+
+```
+func ExampleFanout() {
+    ch := make(chan FanoutTask) // 0 buffer channel
+
+    for i := 0; i < 10; i++ {
+        go FanoutWorker(ch) // channel Reciever
+    }
+
+    FanoutDispatcher(ch) // channel Sender
+}
+
+// channel Reciever
+func FanoutWorker(in chan FanoutTask) {
+    for {
+        task, ok := <-in
+        if !ok {
+            return
+        }
+        ... // process task
+    }
+}
+
+// channel Sender
+func FanoutDispatcher(out chan FanoutTask) {
+    defer close(out)
+    // Get task from Data Storage like DB
+    for {
+        task, err := FanoutGetNextTask()
+        if err != nil {
+            return
+        }
+        // send to channel
+        out<-task
+    }
+}
+```
