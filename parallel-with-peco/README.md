@@ -211,3 +211,41 @@ func FanoutDispatcher(out chan FanoutTask) {
 > 複数のgoroutineが絡んだ処理を実装すると、何らかの条件で関連しているgoroutineにキャンセル通知をしたい場面が出てきます。またその際、一部のgoroutine郡はキャンセルし残りはそのまま処理を続けたいという場合もあります。Go1.7から標準パッケージに同梱されるようになったcontext.Contextを使うと、この処理を簡潔に記述できます。
 
 #### context.Contextの基本
+
+```
+func WorkWithContext(ctx context.Context) {
+    defer close(done)
+    for {
+        select {
+        case <-ctx.Done():
+            return
+        default:
+            // Do normal process if 'Done' isn't returned
+            ...
+        }
+    }
+}
+
+func ExampleContext() {
+    // Create cancelable `Context`
+    ctx, cancel := context.WithCancel(context.Background())
+    // This function is sure to cancel
+    defer cancel()
+
+    // goroutine which does process
+    go WorkWithContext(ctx)
+    ...
+}
+```
+
+> このようにすると、明示的にcancelを呼ぶか、ExampleContext()関数が終了した時点で暗黙的に呼ばれるcancelによって、WorkingWithContext関数内で待ち受けている<-ctx.Done()に通知が送られ、正しくgoroutineを終了できます。
+
+#### キャンセル効果の範囲
+
+> 親をキャンセルするとすべての子もキャンセルされます。子だけをキャンセルした場合は親には影響がありません。つまり、アプリケーション全体のキャンセルも、局所的なキャンセルも可能になります。
+
+> 次のコードでは、ctx1(親)とctx2(子)のcontext.Contextを作成しています。それぞれのキャンセルを待つgoroutineを作成したのち、5秒後と1秒後にそれぞれのキャンセル処理を実行します。
+
+[code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/context-cancel-range.go)
+
+> この特性を使うと、context.Contextを実行される関数に渡していき、必要なところで子context.Contextを作ることによって、「シグナルでアプリケーション全体をキャンセルする」という動作や「特定の処理に紐付いているgoroutineのみをキャンセルする」などの処理を簡単に実装できます。
