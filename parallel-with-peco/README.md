@@ -11,23 +11,23 @@
 #### channelによるデータの送受信
 
 > channelを受け取ったgoroutineが現在の「持ち主」であり、そのgoroutineだけがchannelに対して操作を行える
-> この実装の場合、明示的な排他制御は必要なくなります。
+> この実装の場合、明示的な排他制御は必要なくなります。
 
 #### IDを持たない
 
-> goroutineはIDを持ちません。固有のgoroutineを、スレッドやプロセスのようにそのIDだけでは判別できません。
+> goroutineはIDを持ちません。固有のgoroutineを、スレッドやプロセスのようにそのIDだけでは判別できません。
 
-> IDが指定できないため、シグナルのようなしくみで外部からgoroutineを指定して、その動作に強制的に影響を及ぼすことはできません。そのためgoroutineには、ほぼ必ず明示的に停止するためのしくみを用意する必要があります。
+> IDが指定できないため、シグナルのようなしくみで外部からgoroutineを指定して、その動作に強制的に影響を及ぼすことはできません。そのためgoroutineには、ほぼ必ず明示的に停止するためのしくみを用意する必要があります。
 
 ## channelによるデータ受け渡し
 
-### channelの基本
+### channelの基本
 
 [code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/channel-basic.go)
 
 ### ブロックせずにchannel処理を行う
 
-> 次の例では、3つのchannelの中から読み込み可能なchannelがあればそれを読み込みます。すべてのchannelがデータ到着待ちでブロックするのであれば、defaultのケースが実行されます。
+> 次の例では、3つのchannelの中から読み込み可能なchannelがあればそれを読み込みます。すべてのchannelがデータ到着待ちでブロックするのであれば、defaultのケースが実行されます。
 
 ```
 for {
@@ -44,7 +44,7 @@ for {
 }
 ```
 
-> なお、nilなchannelに対して読み込みを行うと必ずブロックします。selectと合わせて、特定のselectのケースを無効にしたい場合などに便利です。
+> なお、nilなchannelに対して読み込みを行うと必ずブロックします。selectと合わせて、特定のselectのケースを無効にしたい場合などに便利です。
 
 ```
 for {
@@ -52,7 +52,7 @@ for {
     case <-ch1:
       ...
     case <-ch2:
-      // ここでch1をnilにすると、上記のcaseはブロックされ実行されない
+      // ここでch1をnilにすると、上記のcaseはブロックされ実行されない
       ch1 = nil
       ...
     }
@@ -79,7 +79,7 @@ time.AfterFunc(5*time.Second, func() {
 })
 ```
 
-> また、閉じられたchannelから読み込みを行うと、それまですでに書き込まれた値が通常どおり返ってきます。ほかに読み込む値がない状態でさらに読み込みを行うと、channelが返すべき型のゼロ値が即座に返ってきます。
+> また、閉じられたchannelから読み込みを行うと、それまですでに書き込まれた値が通常どおり返ってきます。ほかに読み込む値がない状態でさらに読み込みを行うと、channelが返すべき型のゼロ値が即座に返ってきます。
 
 [code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/closed-channel-behavior.go)
 
@@ -118,14 +118,14 @@ func (c *Cond) Wait()
 
 ### セマフォで同時実行数の制御
 
-> Mutexは上限数が1のセマフォと考えることもできます。
-> Goにはセマフォとう名前のデータ型は存在しませんが、セマフォに相当するものとして、バッファ付きchannelを利用します。
-> 次の例では、バッファ付きchannelの特性を使って同時にhttp.Getを実行可能なgoroutineの数を5個に制限しています。
+> Mutexは上限数が1のセマフォと考えることもできます。
+> Goにはセマフォとう名前のデータ型は存在しませんが、セマフォに相当するものとして、バッファ付きchannelを利用します。
+> 次の例では、バッファ付きchannelの特性を使って同時にhttp.Getを実行可能なgoroutineの数を5個に制限しています。
 
 ```
 func FetchURL(sem chan struct {}, url string) {
-    sem<-struct{}{} // Block when over 10 requests come
-    defer func() { <-sem }() // Release sem when http.Get request process done
+    sem<-struct{}{} // Block when over 10 requests come
+    defer func() { <-sem }() // Release sem when http.Get request process done
 
     res, err := http.Get(url)
     ...
@@ -188,20 +188,26 @@ func FanoutDispatcher(out chan FanoutTask) {
 
 ### ジェネレータで連番の生成
 
-> プログラム内で利用するIDに連番を生成するケースは頻繁にあります。他の言語では、同時に複数の呼び出し元がある場合に連番が正しく生成されていることを保証するには明示的な排他制御が必要ですが、Goであれば安全に連番を生成できます。
+> プログラム内で利用するIDに連番を生成するケースは頻繁にあります。他の言語では、同時に複数の呼び出し元がある場合に連番が正しく生成されていることを保証するには明示的な排他制御が必要ですが、Goであれば安全に連番を生成できます。
 
 [code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/generate-series.go)
 
-> この例のポイントは、channelへの書き込み・読み込みは複数goroutine間で安全なため、一切の明示的な排他制御をせずに正しく連番を扱えることです。
+> この例のポイントは、channelへの書き込み・読み込みは複数goroutine間で安全なため、一切の明示的な排他制御をせずに正しく連番を扱えることです。
 
 ### time.Timerでタイムアウト処理
 
-> N秒後に何らかの処理を行いたい場合は、time.Timerオブジェクトを作成します。
+> N秒後に何らかの処理を行いたい場合は、time.Timerオブジェクトを作成します。
 
 [code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/timeTimer.go)
 
-### time.Tickerで定期的な処理
+### time.Tickerで定期的な処理
 
 > N秒ごとに定期的に処理を行いたい場合もあります。
 
 [code](https://github.com/momotaro98/go-codes-for-learning/blob/master/parallel-with-peco/timeTicker.go)
+
+### context.Contextでキャンセル処理
+
+> 複数のgoroutineが絡んだ処理を実装すると、何らかの条件で関連しているgoroutineにキャンセル通知をしたい場面が出てきます。またその際、一部のgoroutine郡はキャンセルし残りはそのまま処理を続けたいという場合もあります。Go1.7から標準パッケージに同梱されるようになったcontext.Contextを使うと、この処理を簡潔に記述できます。
+
+#### context.Contextの基本
