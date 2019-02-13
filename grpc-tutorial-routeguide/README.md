@@ -13,3 +13,17 @@ $ protoc -I routeguide/ routeguide/route_guide.proto --go_out=plugins=grpc:route
 $ ls ./routeguide
 route_guide.pb.go route_guide.proto
 ```
+
+# How to run
+
+In a terminal
+
+```
+$ go run server/server.go
+```
+
+In another terminal
+
+```
+$ go run client/client.go
+```
