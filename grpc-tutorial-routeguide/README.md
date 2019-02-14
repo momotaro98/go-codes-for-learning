@@ -27,3 +27,10 @@ In another terminal
 ```
 $ go run client/client.go
 ```
+
+# How to generate mock code with [gomock](https://godoc.org/github.com/golang/mock/gomock)
+
+```
+$ cd mock_routeguide
+$ mockgen github.com/momotaro98/go-codes-for-learning/grpc-tutorial-routeguide/routeguide RouteGuideClient,RouteGuide_RouteChatClient | tee routeguide_mock.go
+```
