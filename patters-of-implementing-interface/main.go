@@ -23,5 +23,18 @@ func main() {
 	// castedFuncを渡すことができる。
 	HHandle("/api/v2", castedFunc)
 
-	/// [Topic2] 構造体に埋め込んでインターフェースを実装する
+	/// [ポイント1] 埋め込みの関係
+	aRealToriJin := &RealToriJin{}
+	// ② 構造体ToriJinにFlyingRunnerインターフェースを
+	// 実装したRealToriJinの変数を埋め込む
+	aToriJin := &ToriJin{
+		FlyingRunner: aRealToriJin,
+	}
+	// ③ 構造体ShinJinruiに構造体Torijinを埋め込む
+	// 実装したRealToriJinの変数を埋め込む
+	aShinJinrui := &ShinJinrui{
+		ToriJin: aToriJin,
+	}
+	fmt.Println(aShinJinrui.Fly())
+	fmt.Println(aShinJinrui.Run())
 }
