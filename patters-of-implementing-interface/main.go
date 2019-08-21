@@ -31,10 +31,21 @@ func main() {
 		FlyingRunner: aRealToriJin,
 	}
 	// ③ 構造体ShinJinruiに構造体Torijinを埋め込む
-	// 実装したRealToriJinの変数を埋め込む
 	aShinJinrui := &ShinJinrui{
 		ToriJin: aToriJin,
 	}
 	fmt.Println(aShinJinrui.Fly())
 	fmt.Println(aShinJinrui.Run())
+
+	/// [ポイント2] 埋め込みのメリット
+	aGrassHopper := &grasshopper{}
+	aShinJinrui2 := &ShinJinrui2{
+		grasshopper: aGrassHopper,
+	}
+	if _, ok := interface{}(aShinJinrui2).(HighJumper); ok {
+		fmt.Println("ShinJinrui2はHighJumpRunnerインターフェースを実装しています。")
+	}
+	fmt.Println(aShinJinrui2.HighJump()) // *grasshopperのメソッドを"そのまま"借りている
+
+	/// [ポイント3] 構造体の埋め込みは継承のサブクラス化とは異なる
 }
