@@ -48,4 +48,14 @@ func main() {
 	fmt.Println(aShinJinrui2.HighJump()) // *grasshopperのメソッドを"そのまま"借りている
 
 	/// [ポイント3] 構造体の埋め込みは継承のサブクラス化とは異なる
+	aPoorGrasshopper := &poorGrasshopper{
+		status: Good,
+	}
+	aShinJinrui3 := &ShinJinrui3{
+		status:          Good,
+		poorGrasshopper: aPoorGrasshopper,
+	}
+	aShinJinrui3.HighJump()
+	fmt.Println(aPoorGrasshopper.status) // 1 (Tired)
+	fmt.Println(aShinJinrui3.status)     // 0 (Good)
 }
