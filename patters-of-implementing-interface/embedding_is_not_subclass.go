@@ -7,9 +7,22 @@ import "fmt"
 type Status int
 
 const (
-	Good  Status = iota // 良好
-	Tired               // 疲れている
+	// Good is 良好 status
+	Good Status = iota
+	// Tired is 疲れている status
+	Tired
 )
+
+func (s Status) String() string {
+	switch s {
+	case Good:
+		return "Good!"
+	case Tired:
+		return "Tired..."
+	default:
+		return ""
+	}
+}
 
 type poorGrasshopper struct {
 	status Status // poorGrasshopperには健康状態がある

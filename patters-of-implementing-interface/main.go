@@ -56,6 +56,8 @@ func main() {
 		poorGrasshopper: aPoorGrasshopper,
 	}
 	aShinJinrui3.HighJump()
-	fmt.Println(aPoorGrasshopper.status) // 1 (Tired)
-	fmt.Println(aShinJinrui3.status)     // 0 (Good)
+	// poorGrasshopperの方はステータスが変わるが
+	// メソッドを借りているだけのShinjirui3のステータスは影響されない
+	fmt.Println("aPoorGrasshopper is", aPoorGrasshopper.status) // Tired
+	fmt.Println("aShinJinrui3 is", aShinJinrui3.status)         // Good
 }
