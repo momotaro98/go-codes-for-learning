@@ -60,4 +60,13 @@ func main() {
 	// メソッドを借りているだけのShinjirui3のステータスは影響されない
 	fmt.Println("aPoorGrasshopper is", aPoorGrasshopper.status) // Tired
 	fmt.Println("aShinJinrui3 is", aShinJinrui3.status)         // Good
+
+	/// [ポイント4] 埋め込み元と埋め込み先のフィールド名重複時の挙動
+	aDolphin := &dolphin{}
+	aShinJinrui4 := &ShinJinrui4{
+		dolphin: aDolphin,
+	}
+	// 埋め込まれたdophinにも重複した名前のDiveメソッド
+	// があるが1階層目のShinJinru4の方が優先されて呼ばれる
+	fmt.Println(aShinJinrui4.Dive()) // Shinjinru Dive!
 }
