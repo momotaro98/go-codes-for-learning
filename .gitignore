@@ -6,6 +6,9 @@
 # VSCode
 .vscode/
 
+# Jetbrains
+.idea/
+
 # Common
 *.swp
 
