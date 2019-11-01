@@ -53,4 +53,8 @@ func search(runes1 myrunes, runes2 myrunes) string {
 
 func main() {
 	fmt.Println(twoStrings("aardvark", "apple"))
+
+	// another file
+	arr := [5]int32{7, 69, 2, 221, 8974}
+	miniMaxSum(arr[:])
 }
