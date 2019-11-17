@@ -1,5 +1,38 @@
-# Shift operation
-https://play.golang.org/p/hrEQNM7546Z
+## Shift operation シフト演算
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+// Souce link: https://golangtokyo.connpass.com/event/150891/
+
+const (
+	a, b = iota, iota << iota
+	c, _ // (1 << 1 --> b'10 --> 2)
+	_, d // (2 << 2 --> b'1000 --> 8)
+	e, f // (3 << 3 --> b'11000 --> 24)
+)
+
+func main() {
+	fmt.Println("a", a)
+	fmt.Println("b", b)
+	fmt.Println("c", c)
+	fmt.Println("d", d)
+	fmt.Println("e", e)
+	fmt.Println("f", f)
+	/*
+		a 0
+		b 0
+		c 1
+		d 8
+		e 3
+		f 24
+	*/
+}
+```
 
 # 制御構造
 
