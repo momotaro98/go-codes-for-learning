@@ -77,3 +77,48 @@ func main() {
 	}
 }
 ```
+
+# 関数
+
+## defer statement
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+func trace(s string) string {
+	fmt.Println("entering:", s)
+	return s
+}
+
+func un(s string) {
+	fmt.Println("leaving:", s)
+}
+
+func a() {
+	defer un(trace("a"))
+	fmt.Println("in a")
+}
+
+func b() {
+	defer un(trace("b")) // trace("b")はdefer文の時点で評価されて実行される
+	fmt.Println("in b")
+	a()
+}
+
+func main() {
+	b()
+}
+
+/*
+entering: b
+in b
+entering: a
+in a
+leaving: a
+leaving: b
+*/
+```
