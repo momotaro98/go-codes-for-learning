@@ -38,3 +38,19 @@ Goでは以下のようにするとコメント無しでも上記疑問を解決
 ```go
 func CalculatePi(begin, end int64) <-chan uint
 ```
+
+## 2.2 What is CSP?
+
+CSPは「Communicating Sequential Processes」の略で、手法とそれを紹介した論文のタイトルの両方を指す。1978年にTony Hoareという人が論文で発表した。
+
+CSPはGoのゴルーチンとチャネルの発想の元となっている。
+
+Hoareの論文での例
+
+```
+*[c:character; west?c -> east!c]
+```
+
+westから出力されたすべての文字を読み込み、1つずつeastに出力する。プロセスwestが終了したら繰り返しも終了する。
+
+> たいていの言語はCSPのメッセージパッシング形式よりもメモリを共有し同調する方を好んでいます。GoはCSPの原理を言語の中核として具現化し、この形式の並行プログラミングを大衆にもたらした最初の言語の1つです。
