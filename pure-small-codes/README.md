@@ -171,3 +171,34 @@ Pointer &c is 0x40a100, len(c) is 2, cap(c) is 2
 ```
 
 Slice has information of first pointer address, length, and capacity.
+
+## Map
+
+```go
+package main
+
+import "fmt"
+
+var timeZone = map[string]int{
+	"UTC": 0 * 60 * 60,
+	"EST": -5 * 60 * 60,
+	"CST": -6 * 60 * 60,
+	"MST": -7 * 60 * 60,
+	"PST": -8 * 60 * 60,
+}
+
+func offset(tz string) int {
+	seconds, ok := timeZone[tz] // [Point] Check if there's the key
+	if ok {
+		fmt.Println("Found the tz, seconds is", seconds)
+		return seconds
+	}
+	fmt.Println("zero value seconds", seconds)
+	return 0
+}
+
+func main() {
+	_ = offset("MST") // Found the tz, seconds is -25200
+	_ = offset("JST") // zero value seconds 0
+}
+```
