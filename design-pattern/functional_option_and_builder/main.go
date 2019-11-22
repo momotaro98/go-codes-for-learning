@@ -19,6 +19,6 @@ func main() {
 		WithMovie(false).
 		Build()
 
-	fmt.Println(fopApp) // &{Premium true false true}
-	fmt.Println(bpApp)  // &{Premium true false true}
+	fmt.Printf("%+v\n", fopApp) // &{Course:Premium SubscribeSupportService:true SubscribeMovieService:false SubscribeBackupService:true}
+	fmt.Printf("%+v\n", bpApp)  // &{Course:Premium SubscribeSupportService:true SubscribeMovieService:false SubscribeBackupService:true}
 }
