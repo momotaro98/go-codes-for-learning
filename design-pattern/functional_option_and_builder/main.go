@@ -12,8 +12,6 @@ func main() {
         WithMovie(false),
     )
 
-    fmt.Println(fopApp)
-
     // Builder Pattern (BP)
     bpApp := NewApplicationWithBP(Premium).
         WithBackupService(true).
@@ -21,5 +19,6 @@ func main() {
         WithMovie(false).
         Build()
 
-    fmt.Println(bpApp)
+    fmt.Println(fopApp) // &{Premium true false true}
+    fmt.Println(bpApp)  // &{Premium true false true}
 }
