@@ -202,3 +202,35 @@ func main() {
 	_ = offset("JST") // zero value seconds 0
 }
 ```
+
+## 出力
+
+> 構造体を出力するとき、限定フォーマット%+vを使うと構造体の各フィールドに対してフィールド名も出力されます。また、代替フォーマット%#vを使うとどんな値でも完全なGo言語の構文形式で出力されます。
+
+```go
+type T struct {
+    a int
+    b float
+    c string
+}
+t := &T{ 7, -2.35, "abc\tdef" }
+fmt.Printf("%v\n", t)          // &{7 -2.35 abc   def}
+fmt.Printf("%+v\n", t)         // &{a:7 b:-2.35 c:abc     def}
+fmt.Printf("%#v\n", t)         // &main.T{a:7, b:-2.35, c:"abc\tdef"}
+fmt.Printf("%#v\n", timeZone)  // map[string] int{"CST":-21600, "PST":-28800, "EST":-18000, "UTC":0, "MST":-25200}
+```
+
+```go
+fmt.Printf("%T\n", timeZone) // map[string] int
+```
+
+## append
+
+```go
+x := []int{1,2,3}
+y := []int{4,5,6}
+x = append(x, y...)
+fmt.Println(x)
+```
+
+Goにはジェネリクスが無いためappend関数はコンパイラによって任意の型のスライスに対応できるようにしている。
