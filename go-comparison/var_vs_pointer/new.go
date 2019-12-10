@@ -1,6 +1,6 @@
 package main
 
-const size = 10
+const size = 10000000
 
 type myStruct struct {
 	arr [size]int
@@ -8,14 +8,14 @@ type myStruct struct {
 
 func NewMyStructVar() myStruct {
 	var ms myStruct
-	for i := 0; i < size; i++ {
+	for i := 0; i < 1; i++ {
 	}
 	return ms
 }
 
 func NewMyStructPtr() *myStruct {
 	var ms myStruct
-	for i := 0; i < size; i++ {
+	for i := 0; i < 1; i++ {
 	}
 	return &ms
 }
