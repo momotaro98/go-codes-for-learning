@@ -1,6 +1,6 @@
 package main
 
-const size = 10000000
+const size = 100
 
 type myStruct struct {
 	arr [size]int

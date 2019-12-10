@@ -1,9 +1,9 @@
 package main
 
 func main() {
-	var sum int
+	var list []*myStruct
 	for i := 0; i < 1000; i++ {
 		v := NewMyStructPtr()
-		sum += v.arr[0]
+		list = append(list, v)
 	}
 }
