@@ -5,17 +5,21 @@ import (
 )
 
 func BenchmarkVar(b *testing.B) {
-	var list []myStruct
+	var sum int // short_life
+	//var list []myStruct // long_life
 	for i := 0; i < b.N; i++ {
 		v := NewMyStructVar()
-		list = append(list, v)
+		sum += v.arr[0] // short_life
+		// list = append(list, v) // long_life
 	}
 }
 
 func BenchmarkPointer(b *testing.B) {
-	var list []*myStruct
+	var sum int // short_life
+	//var list []myStruct // long_life
 	for i := 0; i < b.N; i++ {
 		v := NewMyStructPtr()
-		list = append(list, v)
+		sum += v.arr[0] // short_life
+		// list = append(list, v) // long_life
 	}
 }
