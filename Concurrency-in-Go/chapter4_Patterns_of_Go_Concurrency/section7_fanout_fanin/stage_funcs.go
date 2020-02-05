@@ -1,7 +1,5 @@
 package main
 
-import "math"
-
 func repeatFn(done <-chan interface{}, fn func() interface{}) <-chan interface{} {
 	ch := make(chan interface{})
 	go func() {
@@ -35,6 +33,7 @@ func toInt(done, valueCh <-chan interface{}) <-chan int {
 func primeClassifier(done <-chan interface{}, intCh <-chan int) <-chan int {
 	primeCh := make(chan int)
 
+	/* // This isPrime is 1000x faster than slow one
 	isPrime := func(num int) bool {
 		if num < 2 {
 			return false
@@ -45,6 +44,23 @@ func primeClassifier(done <-chan interface{}, intCh <-chan int) <-chan int {
 		}
 		var sqrt float64 = math.Sqrt(float64(num))
 		for i := 3; float64(i) < sqrt; i += 2 {
+			if num%i == 0 {
+				return false
+			}
+		}
+		return true
+	}
+	*/
+
+	isPrime := func(num int) bool {
+		if num < 2 {
+			return false
+		} else if num == 2 {
+			return true
+		} else if num%2 == 0 {
+			return false
+		}
+		for i := 3; i < num; i++ {
 			if num%i == 0 {
 				return false
 			}
