@@ -5,10 +5,24 @@ import (
 	"fmt"
 )
 
+type AppError struct {
+	orgErr error
+	code   string
+}
+
+func (e AppError) Error() string {
+	return fmt.Sprintf("code: %s, msg: app error occurred", e.code)
+}
+
+func (e AppError) Unwrap() error {
+	return e.orgErr
+}
+
 func service(text string) error {
 	_, err := ParseLibFunc(text)
 	if err != nil {
-		return fmt.Errorf("service error with '%w'", err) // Unwrapを実装したエラーを返す
+		// return fmt.Errorf("service error with '%w'", err) // Unwrapを実装したエラーを返す
+		return AppError{orgErr: err, code: "00A"}
 	}
 	fmt.Println("service finished successfully")
 	return err
@@ -16,10 +30,12 @@ func service(text string) error {
 
 func main() {
 	if err := service("2020/02/14"); err != nil {
+		fmt.Printf("%T\n", err)
 		fmt.Println(err) // service error with 'lib: parse error'
 
 		// Unwrap関数 でライブラリ関数を取り出す
 		wrappedErr := errors.Unwrap(err)
+		fmt.Printf("%T\n", wrappedErr)
 		fmt.Println(wrappedErr)
 
 		// Is

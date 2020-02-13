@@ -14,8 +14,8 @@ type LibTime time.Time
 func ParseLibFunc(text string) (LibTime, error) {
 	t, err := time.Parse(time.RFC3339, text)
 	if err != nil {
-		//return LibTime{}, &LibError{kind: "Parse", orgError: err}
-		return LibTime{}, ErrParse
+		return LibTime{}, &LibError{kind: "Parse", orgError: err}
+		//return LibTime{}, ErrParse
 	}
 	return LibTime(t), nil
 }
