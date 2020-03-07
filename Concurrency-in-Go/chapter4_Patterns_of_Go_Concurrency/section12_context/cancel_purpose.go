@@ -7,12 +7,16 @@ import (
 	"time"
 )
 
+// $ go run XXX.go
+// connot print greeting: context deadline exceeded
+// cannot print farewell: context canceled
+
 // 【ポイント】
 // i.   mainはGreetingが失敗したら一番親のContextをキャンセルにする。
 //
 // ii.  Greetingは親のContextをcontext.WithTimeoutで囲む。
 //      これによって1秒後には自分の子供をすべてキャンセルにする。この場合はlocaleをキャンセルにする。
-// 
+//
 // iii. 呼び出し元から渡されたContextがキャンセルされた場合(Done()からチャネルが返った場合)、
 //      Contextがキャンセル理由と共にエラーを返す。このエラーはmainにまで伝搬され、これが i. での
 //      キャンセルを発生させ、Farewell側のlocaleでもキャンセルになる。
