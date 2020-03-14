@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	logger "github.com/momotaro98/go-codes-for-learning/microservice-logging/logger"
+	"github.com/momotaro98/go-codes-for-learning/microservice-logging/logger"
 )
 
 var (

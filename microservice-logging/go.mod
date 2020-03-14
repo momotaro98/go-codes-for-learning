@@ -1,4 +1,4 @@
-module github.com/momotaro98/go-codes-for-learning/microservice-logging/logger
+module github.com/momotaro98/go-codes-for-learning/microservice-logging
 
 go 1.13
 

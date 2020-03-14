@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/momotaro98/go-codes-for-learning/microservice-logging/logger/logger"
+
+	"github.com/momotaro98/go-codes-for-learning/microservice-logging/logger"
 )
 
 type Service interface {
