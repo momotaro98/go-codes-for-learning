@@ -1,4 +1,4 @@
-package new_gin_logging
+package main
 
 import (
 	"net/url"
