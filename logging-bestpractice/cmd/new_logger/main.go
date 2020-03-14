@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	logger "git.rarejob.com/shintaro.ikeda/platform_logging/new_logger"
+	logger "github.com/momotaro98/go-codes-for-learning/logging-bestpractice/new_logger"
 )
 
 type Service interface {
