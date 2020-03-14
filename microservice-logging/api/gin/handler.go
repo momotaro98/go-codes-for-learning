@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	// "git.rarejob.com/rarejob-platform/student-account/src/services"
 )
 
 const (
@@ -13,7 +12,6 @@ const (
 	XTransactionID    = "X-Transaction-ID"
 )
 
-// HandlerSampleEndpoint ...
 var (
 	s = NewService()
 

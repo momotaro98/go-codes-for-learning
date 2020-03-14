@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	logger "git.rarejob.com/shintaro.ikeda/platform_logging/new_logger"
+	"github.com/momotaro98/go-codes-for-learning/microservice-logging/logger"
 )
 
 type logging struct {

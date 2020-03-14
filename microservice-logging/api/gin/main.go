@@ -3,12 +3,10 @@ package main
 import (
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
 
-	"git.rarejob.com/shintaro.ikeda/platform_logging/new_gin_logging"
-	logger "git.rarejob.com/shintaro.ikeda/platform_logging/new_logger"
+	logger "github.com/momotaro98/go-codes-for-learning/microservice-logging/logger"
 )
 
 const (
@@ -19,15 +17,13 @@ var (
 	version  = "unknown"
 	revision = "unknown"
 	host, _  = os.Hostname()
-	begin    = time.Now()
 )
 
 func main() {
 	router := gin.New()
 	{
 		router.Use(
-			//gin_logging.LoggerWithWriter(c.Logger.AccessLogWriter /* Exclude Path */, "/example/path"),
-			new_gin_logging.LoggerWithWriter(logger.DefaultLogger() /* Exclude Path */, "/example/path"),
+			LoggerWithWriter(logger.DefaultLogger() /* Exclude Path */, "/example/path"),
 			Recovery(), // Recovery is a Gin middleware to handle panic error of application.
 		)
 	}

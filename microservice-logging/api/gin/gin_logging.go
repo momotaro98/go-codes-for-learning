@@ -6,11 +6,9 @@ import (
 	"strings"
 	"time"
 
-	//authlib "git.rarejob.com/rarejob-platform/golibs/auth"
-	//authmiddleware "git.rarejob.com/rarejob-platform/golibs/gin/middlewares/auth"
 	"github.com/gin-gonic/gin"
 
-	logger "git.rarejob.com/shintaro.ikeda/platform_logging/new_logger"
+	"github.com/momotaro98/go-codes-for-learning/microservice-logging/logger"
 )
 
 var (
@@ -18,27 +16,8 @@ var (
 	hostName, _ = os.Hostname()
 )
 
-// [Old] The `Logger` is not used in existing Student Account code
-// Logger is ...
-//func Logger(excludePaths ...string) gin.HandlerFunc {
-//	return LoggerWithWriter(gin.DefaultWriter, excludePaths...)
-//}
-
-// LoggerWithWriter is ...
-//func LoggerWithWriter(out io.Writer, excludePaths ...string) gin.HandlerFunc {
 func LoggerWithWriter(l logger.Logger, excludePaths ...string) gin.HandlerFunc {
 	var (
-		//pool = &sync.Pool{
-		//	New: func() interface{} {
-		//		return new(bytes.Buffer)
-		//	},
-		//}
-		//firstFieldKey = func() string {
-		//	if len(logFieldEntries) > 0 {
-		//		return logFieldEntries[0].key
-		//	}
-		//	return ""
-		//}()
 		containsExcludePath = func(path string) bool {
 			for _, p := range excludePaths {
 				if p == path {
@@ -53,28 +32,12 @@ func LoggerWithWriter(l logger.Logger, excludePaths ...string) gin.HandlerFunc {
 			if containsExcludePath(ctx.Request.URL.Path) {
 				return
 			}
-			//buf := pool.Get().(*bytes.Buffer)
-			//buf.Reset()
 			fields := make([]logger.Field, len(logFieldEntries))
 			for i, entry := range logFieldEntries {
 				if val := entry.valueFunc(ctx); val != nil {
 					fields[i] = logger.F(entry.key, val)
-					// [Old]
-					//if entry.key != firstFieldKey {
-					//	buf.WriteByte('\t')
-					//}
-					//buf.WriteString(entry.key)
-					//buf.WriteByte(':')
-					//buf.WriteString(fmt.Sprint(val))
 				}
 			}
-			// [Old]
-			//buf.WriteByte('\n')
-
-			// write access log
-			//buf.WriteTo(out)
-			//pool.Put(buf)
-
 			l.Info(c.Request.Header.Get(logger.XTransactionID),
 				"Sample Service Gin Access",
 				"Sample Service Gin Access",
@@ -87,10 +50,6 @@ func LoggerWithWriter(l logger.Logger, excludePaths ...string) gin.HandlerFunc {
 	}
 }
 
-////////////////////////////////////////////
-// accessLogContext
-////////////////////////////////////////////
-
 type accessLogContext struct {
 	*gin.Context
 	begin time.Time
@@ -102,20 +61,6 @@ func newAccessLogContext(c *gin.Context) *accessLogContext {
 		begin:   nowFunc(),
 	}
 }
-
-//func (c *accessLogContext) payload() authlib.Payload {
-//	// TODO 本来は不要な実装なのでauthlibリファクタ後に修正
-//	if payloadValue, exists := c.Get(authmiddleware.PayloadKeyName); exists {
-//		if payload, ok := payloadValue.(authlib.Payload); ok {
-//			return payload
-//		}
-//	}
-//	return nil
-//}
-
-////////////////////////////////////////////
-// logFieldEntry
-////////////////////////////////////////////
 
 type logFieldEntry struct {
 	key       string
@@ -172,51 +117,6 @@ var logFieldEntries = []logFieldEntry{
 			return nowFunc().Sub(c.begin).Round(time.Millisecond)
 		},
 	},
-	//{ // [Old]
-	//	key: "transaction",
-	//	valueFunc: func(c *accessLogContext) interface{} {
-	//		if txID := c.Request.Header.Get("X-Transaction-ID"); len(txID) > 0 {
-	//			return txID
-	//		}
-	//		return "unknown"
-	//	},
-	//},
-	//{
-	//	key: "product",
-	//	valueFunc: func(c *accessLogContext) interface{} {
-	//		if payload := c.payload(); payload != nil {
-	//			return payload.ProductID()
-	//		}
-	//		return "unknown"
-	//	},
-	//},
-	//{
-	//	key: "user_category",
-	//	valueFunc: func(c *accessLogContext) interface{} {
-	//		if payload := c.payload(); payload != nil {
-	//			return payload.ActorUserCategoryID()
-	//		}
-	//		return "unknown"
-	//	},
-	//},
-	//{
-	//	key: "user_group",
-	//	valueFunc: func(c *accessLogContext) interface{} {
-	//		if payload := c.payload(); payload != nil {
-	//			return payload.ActorUserGroupID()
-	//		}
-	//		return "unknown"
-	//	},
-	//},
-	//{
-	//	key: "user_id",
-	//	valueFunc: func(c *accessLogContext) interface{} {
-	//		if payload := c.payload(); payload != nil {
-	//			return payload.ActorUserID()
-	//		}
-	//		return "unknown"
-	//	},
-	//},
 	{
 		key: "comment",
 		valueFunc: func(c *accessLogContext) interface{} {

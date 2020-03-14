@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	logger "git.rarejob.com/shintaro.ikeda/platform_logging/new_logger"
+	logger "github.com/momotaro98/go-codes-for-learning/microservice-logging/logger"
 )
 
 var (
@@ -27,25 +27,17 @@ func Recovery() gin.HandlerFunc {
 					stack  = make([]byte, defaultStackSize)
 					length = runtime.Stack(stack, true)
 				)
-				// [New]
 				logger.DefaultLogger().Error(c.Request.Header.Get(logger.XTransactionID),
 					ServiceName,
 					/* msg */ "panic recovered",
 					logger.E(err),
 					logger.F("stack", fmt.Sprintf("%s ", stack[:length])),
 				)
-				// [Old]
-				//logger.Error("panic recovered",
-				//	logger.E(err),
-				//	logger.F("stack", fmt.Sprintf("%s ", stack[:length])),
-				//	logger.F("transaction", c.Request.Header.Get("X-Transaction-ID")),
-				//)
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{
 					"errors": []string{"unexpected error"},
 				})
 			}
 		}()
-		// process request
 		c.Next()
 	}
 }
