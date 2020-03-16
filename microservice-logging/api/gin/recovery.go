@@ -27,11 +27,10 @@ func Recovery() gin.HandlerFunc {
 					stack  = make([]byte, defaultStackSize)
 					length = runtime.Stack(stack, true)
 				)
-				logger.DefaultLogger().Error(c.Request.Header.Get(logger.XTransactionID),
-					ServiceName,
-					/* msg */ "panic recovered",
-					logger.E(err),
-					logger.F("stack", fmt.Sprintf("%s ", stack[:length])),
+				logger.Log.Error(
+					/* Request-ID */ c.Request.Header.Get(logger.XTransactionID),
+					/* msg */ err.Error(),
+					/* Additional fields */ logger.F("stack", fmt.Sprintf("%s ", stack[:length])),
 				)
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{
 					"errors": []string{"unexpected error"},

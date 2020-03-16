@@ -1,60 +1,58 @@
 package logger
 
-
 import (
 	"io"
 	"os"
 )
 
-// Config is a struct for logger
-//
-// minLevel: Minimum level to log. When the minLevel is Warn,
-// logger logs only "Warn", "Error", "Fatal"
+// Config はLoggerのための設定の構造体です。
 //
 // formatter: Format type of logging, TEXT or JSON
-//
-// out: io.Writer to log
+// out:       io.Writer of the logger output
+// minLevel:  Minimum level to out
 type Config struct {
-	minLevel  Level
 	formatter Formatter
 	out       io.Writer
+	minLevel  Level
 }
 
-// ConfigOption is ...
+// ConfigOption はFunctional Options Patternの
+// Configのフィールドを設定するための関数の型です。
 type ConfigOption func(*Config)
 
-// WithMaxLevel is ...
-func WithMinLevel(minLevel Level) ConfigOption {
-	return func(c *Config) {
-		c.minLevel = minLevel
-	}
-}
-
-// WithFormatter is ...
-func WithFormatter(formatter Formatter) ConfigOption {
-	return func(c *Config) {
-		c.formatter = formatter
-	}
-}
-
-// WithOut is ...
-func WithOut(out io.Writer) ConfigOption {
-	return func(c *Config) {
-		c.out = out
-	}
-}
-
-// NewConfig makes Configuration struct of logging.
-// This takes option args if needed as Functional options pattern.
-// Defaults are MinLevel: Info, Formatter: JSON, Out: std out
+// NewConfig は *Config のコンストラクタです。
+//
+// マイクロサービスのルールであるデフォルトの設定
+// Formatter: JSON
+// Out:       STD OUT
+// MinLevel:  Info
 func NewConfig(options ...ConfigOption) *Config {
 	config := &Config{
-		minLevel: Levels.Info,
 		formatter: Formatters.JSON,
 		out:       os.Stdout,
+		minLevel: Levels.Info,
 	}
 	for _, option := range options {
 		option(config)
 	}
 	return config
 }
+
+func WithMinLevel(minLevel Level) ConfigOption {
+	return func(c *Config) {
+		c.minLevel = minLevel
+	}
+}
+
+func WithFormatter(formatter Formatter) ConfigOption {
+	return func(c *Config) {
+		c.formatter = formatter
+	}
+}
+
+func WithOut(out io.Writer) ConfigOption {
+	return func(c *Config) {
+		c.out = out
+	}
+}
+

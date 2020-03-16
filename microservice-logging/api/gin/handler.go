@@ -34,7 +34,6 @@ func makeSampleEndpoint(service Service) gin.HandlerFunc {
 
 		output, err := service.SearchSample(toNormalContext(c), "sample-id-test")
 		if err != nil {
-			//handleError(c, err) // Skipping handle error
 			return
 		}
 

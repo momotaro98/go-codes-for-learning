@@ -1,9 +1,7 @@
 package main
 
 import (
-	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -40,12 +38,10 @@ func LoggerWithWriter(l logger.Logger, excludePaths ...string) gin.HandlerFunc {
 			}
 			l.Info(c.Request.Header.Get(logger.XTransactionID),
 				"Sample Service Gin Access",
-				"Sample Service Gin Access",
 				fields...,
 			)
 		}(newAccessLogContext(c))
 
-		// process request
 		c.Next()
 	}
 }
@@ -75,55 +71,15 @@ var logFieldEntries = []logFieldEntry{
 		},
 	},
 	{
-		key: "client_ip",
-		valueFunc: func(c *accessLogContext) interface{} {
-			return c.ClientIP()
-		},
-	},
-	{
-		key: "method",
-		valueFunc: func(c *accessLogContext) interface{} {
-			return c.Request.Method
-		},
-	},
-	{
 		key: "path",
 		valueFunc: func(c *accessLogContext) interface{} {
 			return c.Request.URL.EscapedPath()
 		},
 	},
 	{
-		key: "query",
-		valueFunc: func(c *accessLogContext) interface{} {
-			if len(c.Request.URL.RawQuery) == 0 {
-				return nil
-			}
-			escapedQuery, err := url.QueryUnescape(c.Request.URL.RawQuery)
-			if err != nil {
-				return c.Request.URL.RawQuery
-			}
-			return escapedQuery
-		},
-	},
-	{
-		key: "status",
-		valueFunc: func(c *accessLogContext) interface{} {
-			return c.Writer.Status()
-		},
-	},
-	{
 		key: "response_time",
 		valueFunc: func(c *accessLogContext) interface{} {
 			return nowFunc().Sub(c.begin).Round(time.Millisecond)
-		},
-	},
-	{
-		key: "comment",
-		valueFunc: func(c *accessLogContext) interface{} {
-			if c.Errors == nil || len(c.Errors) == 0 {
-				return nil
-			}
-			return strings.Join(c.Errors.Errors(), ",")
 		},
 	},
 }

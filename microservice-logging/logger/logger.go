@@ -7,18 +7,41 @@ import (
 const (
 	XTransactionID = "X-Transaction-ID"
 
-	logKeyOfXTxID       = "transaction"
+	logKeyOfXTxID       = "request-id"
 	logKeyOfServiceName = "service-name"
 )
 
-// DefaultLogger is a constructor of Logger interface with default config settings.
-func DefaultLogger() Logger {
+var (
+	// ServiceName は各アプリケーションのビルド時に ldflags を利用して埋め込まれます。
+	// 下記がビルド時の例です。
+	// go build -ldflags "-X path/microservice-logging/logger.ServiceName=MicroService01"
+	ServiceName = "not-set"
+
+	// Log は本パッケージのグローバルインスタンスです。
+	Log = defaultLogger()
+)
+
+// Logger は本パッケージの公開インターフェースです。
+type Logger interface {
+	Debug(xTxID interface{}, msg string, fields ...Field)
+	Info(xTxID interface{}, msg string, fields ...Field)
+	Error(xTxID interface{}, msg string, fields ...Field)
+}
+
+func defaultLogger() Logger {
 	return newLogger(NewConfig())
 }
 
-// NewLogger is a constructor of Logger interface which takes configuration.
+// NewLogger は Logger インターフェースのコンストラクタ です。
+// 基本として、マイクロサービスのアプリケーションはこれを利用せずに Log インスタンスを利用することがルールです。
+// 開発をする場合や調査をする場合などで Config を設定しこのメソッドを呼び出しましょう。
 func NewLogger(conf *Config) Logger {
-	return NewLogger(conf)
+	return newLogger(conf)
+}
+
+type logger struct {
+	*logrus.Logger
+	config *Config
 }
 
 func newLogger(config *Config) Logger {
@@ -34,82 +57,33 @@ func newLogger(config *Config) Logger {
 	}
 }
 
-type LoggerContext struct {
-	XTxID       string
-	ServiceName string
-	Msg         string
-}
-
-// Logger is an interface of Logging
-type Logger interface {
-
-	// Existing:  // Info(msg string, fields ...Field)
-	// Solution1: // Info(xTxID, serviceName, msg string, fields ...Field)
-	// Solution2: // Info(loggerCtx LoggerContext, fields ...Field)
-	//
-	// Solution1 は共通性が強い反面、変更に弱い
-	// Solution2 は変更に強い反面、共通性に弱い
-
-	Debug(xTxID, serviceName interface{}, msg string, fields ...Field)
-	Info(xTxID, serviceName interface{}, msg string, fields ...Field)
-	Warn(xTxID, serviceName interface{}, msg string, fields ...Field)
-	Error(xTxID, serviceName interface{}, msg string, fields ...Field)
-	Panic(xTxID, serviceName interface{}, msg string, fields ...Field)
-}
-
-type logger struct {
-	*logrus.Logger
-	config *Config
-}
-
-func (l *logger) Debug(xTxID, serviceName interface{}, msg string, fields ...Field) {
+func (l *logger) Debug(xTxID interface{}, msg string, fields ...Field) {
 	if l.enabledLogLevel(Levels.Debug) {
-		l.withFields(l.mergeToFields(xTxID, serviceName, fields...)...).Debug(msg)
+		l.withFields(l.mergeToFields(xTxID, fields...)...).Debug(msg)
 	}
 }
 
-func (l *logger) Info(xTxID, serviceName interface{}, msg string, fields ...Field) {
+func (l *logger) Info(xTxID interface{}, msg string, fields ...Field) {
 	if l.enabledLogLevel(Levels.Info) {
-		l.withFields(l.mergeToFields(xTxID, serviceName, fields...)...).Info(msg)
+		l.withFields(l.mergeToFields(xTxID, fields...)...).Info(msg)
 	}
 }
 
-func (l *logger) Warn(xTxID, serviceName interface{}, msg string, fields ...Field) {
-	//if l.enabledLogLevel(Levels.Warn) {
-	//	l.withFields(fields...).Warn(msg)
-	//}
-
-	if l.enabledLogLevel(Levels.Warn) {
-		l.withFields(l.mergeToFields(xTxID, serviceName, fields...)...).Warn(msg)
-	}
-}
-
-func (l *logger) Error(xTxID, serviceName interface{}, msg string, fields ...Field) {
-	//func (l *logger) Error(msg string, fields ...Field) {
-	//if l.enabledLogLevel(Levels.Error) {
-	//	l.withFields(fields...).Error(msg)
-	//}
-
+func (l *logger) Error(xTxID interface{}, msg string, fields ...Field) {
 	if l.enabledLogLevel(Levels.Error) {
-		l.withFields(l.mergeToFields(xTxID, serviceName, fields...)...).Error(msg)
+		l.withFields(l.mergeToFields(xTxID, fields...)...).Error(msg)
 	}
 }
 
-func (l *logger) Panic(xTxID, serviceName interface{}, msg string, fields ...Field) {
-	//if l.enabledLogLevel(Levels.Panic) {
-	//	l.withFields(fields...).Panic(msg)
-	//}
-
-	if l.enabledLogLevel(Levels.Panic) {
-		l.withFields(l.mergeToFields(xTxID, serviceName, fields...)...).Panic(msg)
+func (l *logger) mergeToFields(xTxID interface{}, fields ...Field) []Field {
+	// Required fields
+	var requiredFields = []Field{
+		{key: logKeyOfXTxID, value: xTxID},
+		{key: logKeyOfServiceName, value: ServiceName},
 	}
-}
 
-func (l *logger) mergeToFields(xTxID, serviceName interface{}, fields ...Field) []Field {
-	mFields := make([]Field, 0, 2+len(fields)) // 2 means xTxID and serviceName
-	xTxIDField := Field{key: logKeyOfXTxID, value: xTxID}
-	serviceNameField := Field{key: logKeyOfServiceName, value: serviceName}
-	mFields = append(mFields, xTxIDField, serviceNameField)
+	mFields := make([]Field, 0, len(requiredFields)+len(fields))
+	mFields = append(mFields, requiredFields...)
 	return append(mFields, fields...)
 }
 

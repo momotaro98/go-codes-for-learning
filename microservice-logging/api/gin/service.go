@@ -16,10 +16,11 @@ type service struct{}
 func NewService() Service {
 	return newLoggingFilter(
 		&service{},
-		logger.DefaultLogger,
+		func() logger.Logger { return logger.Log },
 	)
 }
 
 func (s *service) SearchSample(ctx context.Context, sampleID string) (string, error) {
+	panic("SearchSample panic!")
 	return "SearchSample result", nil
 }

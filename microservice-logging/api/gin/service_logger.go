@@ -13,7 +13,7 @@ type logging struct {
 
 // info is the application's common logging function
 func (l *logging) info(ctx context.Context, msg string, fields ...logger.Field) {
-	l.loggerFunc().Info(ctx.Value(transactionCtxKey), ServiceName, msg, fields...)
+	l.loggerFunc().Info(ctx.Value(transactionCtxKey), msg, fields...)
 }
 
 func newLoggingFilter(next Service, loggerFunc func() logger.Logger) Service {

@@ -15,4 +15,3 @@ var Formatters = struct {
 	Text: Formatter{Formatter: &logrus.TextFormatter{}},
 	JSON: Formatter{Formatter: &logrus.JSONFormatter{}},
 }
-
