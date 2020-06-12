@@ -1,0 +1,13 @@
+pkgname   = "models"
+output    = "models"
+tag       = []
+
+[mysql]
+dbname    = "sample_db"
+host      = "127.0.0.1"
+port      = 3306
+user      = "root"
+pass      = "mysql"
+sslmode   = "false"
+whitelist = []
+blacklist = []
