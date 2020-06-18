@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 func repo() error {
