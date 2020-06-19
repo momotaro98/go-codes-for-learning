@@ -7,6 +7,7 @@ import (
 
 	"github.com/momotaro98/go-codes-for-learning/Writing-an-Interpreter-in-Go/monkey/evaluator"
 	"github.com/momotaro98/go-codes-for-learning/Writing-an-Interpreter-in-Go/monkey/lexer"
+	"github.com/momotaro98/go-codes-for-learning/Writing-an-Interpreter-in-Go/monkey/object"
 	"github.com/momotaro98/go-codes-for-learning/Writing-an-Interpreter-in-Go/monkey/parser"
 )
 
@@ -14,6 +15,7 @@ const PROMPT = ">> "
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnvironment()
 
 	for {
 		fmt.Printf(PROMPT)
@@ -32,7 +34,7 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		evaluated := evaluator.Eval(program)
+		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
