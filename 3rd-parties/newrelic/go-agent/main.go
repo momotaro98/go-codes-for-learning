@@ -13,9 +13,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func compServer(r *goji.Mux) {
-	r.HandleFunc(pat.Get("/comhash"), compHandler)
-	log.Fatal(http.ListenAndServe(":5000", r))
+func compServer() {
+	mux := goji.NewMux()
+	mux.HandleFunc(pat.Get("/comhash"), compHandler)
+	log.Fatal(http.ListenAndServe(":5000", mux))
 }
 
 type resCom struct {
@@ -48,10 +49,10 @@ func compHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	go compServer()
+
 	mux := goji.NewMux()
-
-	go compServer(mux)
-
+	mux.Use(nrt)
 	mux.HandleFunc(pat.Get("/sample"), sampleHandler)
 	log.Fatal(http.ListenAndServe(":8000", mux))
 }
