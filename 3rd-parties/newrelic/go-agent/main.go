@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,6 +12,10 @@ import (
 	"goji.io/pat"
 
 	"golang.org/x/crypto/bcrypt"
+
+	"time"
+
+	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 func compServer() {
@@ -58,6 +63,8 @@ func main() {
 }
 
 func sampleHandler(w http.ResponseWriter, r *http.Request) {
+	checklogic(r.Context())
+
 	ok, err := conCompareHashAndPassword(r, "abc", "def")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -71,17 +78,25 @@ func sampleHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func checklogic(ctx context.Context) {
+	s := newrelic.FromContext(ctx).StartSegment("checklogic")
+	defer s.End()
+	time.Sleep(time.Millisecond * 5)
+}
+
 func conCompareHashAndPassword(r *http.Request, stored, input string) (bool, error) {
 	stored = url.QueryEscape(stored)
 	input = url.QueryEscape(input)
 	url := fmt.Sprintf("http://localhost:5000/comhash?stored=%s&input=%s", stored, input)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req = req.WithContext(r.Context())
 	if err != nil {
 		return false, err
 	}
-	res, err := http.DefaultClient.Do(req)
+	// res, err := http.DefaultClient.Do(req)
+	res, err := client.Do(req) // client is wrapped by new relic
 	if err != nil {
-		log.Printf("err in DefaultClient in conCompareHashAndPassword")
+		log.Printf("err in http request in conCompareHashAndPassword")
 		return false, err
 	}
 	defer res.Body.Close()
