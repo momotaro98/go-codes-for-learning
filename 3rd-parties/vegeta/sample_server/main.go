@@ -4,10 +4,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func RandStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
 
 func main() {
 	r := mux.NewRouter()
@@ -33,12 +49,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("email:", form.Email)
 
+	time.Sleep(time.Millisecond * 350)
+
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(struct {
 		JWT string `json:"jwt_token"`
 	}{
-		JWT: "xxx.yyy.zzz",
+		JWT: RandStringRunes(20),
 	})
 	return
 }
@@ -46,6 +64,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 func profile(w http.ResponseWriter, r *http.Request) {
 	log.Println("profile request")
 	log.Println("r.Header", r.Header)
+	time.Sleep(time.Millisecond * 100)
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(struct {

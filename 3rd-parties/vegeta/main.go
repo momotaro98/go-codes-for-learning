@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -39,16 +38,17 @@ func main() {
 
 	targeters := []*ProductTargeter{
 		{
+			// ログインエンドポイント
 			Login,
 			NewLoginTargeter("login_user.csv"),
 		},
 		{
+			// 予定取得エンドポイント
 			Schedule,
 			NewScheduleTargeter(tokenChn),
 		},
 	}
 
-	fmt.Println(*rate)
 	rt := vegeta.Rate{Freq: *rate / len(targeters), Per: time.Second}
 	dur := time.Duration(*duration) * time.Second
 
@@ -61,11 +61,13 @@ func main() {
 		go func() {
 			defer wg.Done()
 			for res := range vegeta.NewAttacker().Attack(t.targeter, rt, dur, string(t.ttype)) {
+				// 全アカウント分終了すると空の結果が返るのでそれはMetricsに含めないようにする
 				if res == nil || res.Error == vegeta.ErrNoTargets.Error() {
 					continue
 				}
 				switch t.ttype {
 				case Login:
+					// ログインから返ったJWTトークンを予定取得リクエストに引き渡す
 					go PassToken(res.Body, tokenChn)
 				}
 				metrics.Lock()
@@ -75,57 +77,10 @@ func main() {
 		}()
 	}
 
-	//wg.Add(1)
-	//go func() {
-	//	defer wg.Done()
-	//	for res := range vegeta.NewAttacker().Attack(loginTargeter, rate, dur, "login-attacker") {
-	//		go PassToken(res.Body, tokenChn)
-	//		metrics.Lock()
-	//		metrics.Add(res)
-	//		metrics.Unlock()
-	//	}
-	//}()
-	//
-	//wg.Add(1)
-	//go func() {
-	//	defer wg.Done()
-	//	for res := range vegeta.NewAttacker().Attack(scheduleTargeter, rate, dur, "schedule-attacker") {
-	//		metrics.Lock()
-	//		metrics.Add(res)
-	//		metrics.Unlock()
-	//	}
-	//}()
-
-	//loop:
-	//	for {
-	//		select {
-	//		case res := <-vegeta.NewAttacker().Attack(loginTargeter, rate, dur, "login-attacker"):
-	//			fmt.Println("login dadada")
-	//			if res == nil || res.Error == vegeta.ErrNoTargets.Error() {
-	//				continue
-	//			}
-	//			go PassToken(res.Body, tokenChn)
-	//			metrics.Lock()
-	//			metrics.Add(res)
-	//			metrics.Unlock()
-	//		case res := <-vegeta.NewAttacker().Attack(scheduleTargeter, rate, dur, "schedule-attacker"):
-	//			if res == nil {
-	//				continue
-	//			}
-	//			if res.Error == vegeta.ErrNoTargets.Error() {
-	//				fmt.Println("break?")
-	//				fmt.Println(res)
-	//				break loop
-	//			}
-	//			metrics.Lock()
-	//			metrics.Add(res)
-	//			metrics.Unlock()
-	//		}
-	//	}
-
 	wg.Wait()
 	metrics.Close()
 
+	// 結果をJSONフォーマットにする
 	b, err := json.Marshal(metrics)
 	if err != nil {
 		panic(err)

@@ -29,6 +29,7 @@ var (
 	countMutex sync.Mutex
 )
 
+// CSVファイルから全アカウントのクレデンシャル情報をロード
 func LoadLoginUsers(filePath string) (targets []*LoginTarget, err error) {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -63,6 +64,7 @@ func LoadLoginUsers(filePath string) (targets []*LoginTarget, err error) {
 	return targets, nil
 }
 
+// ログインリクエスト
 func NewLoginTargeter(userFilePath string) vegeta.Targeter {
 	targets, err := LoadLoginUsers(userFilePath)
 	if err != nil {
@@ -114,6 +116,7 @@ func PassToken(resBody []byte, tokenChn chan<- string) {
 	json.Unmarshal(resBody, &loginRes)
 	tokenChn <- loginRes.JwtToken
 
+	// 全アカウント分終了時にトークン用のチャネルを閉じるための制御
 	countMutex.Lock()
 	defer countMutex.Unlock()
 	loginCount++

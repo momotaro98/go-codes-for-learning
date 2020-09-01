@@ -13,6 +13,7 @@ type ScheduleTargeter struct {
 	Header http.Header
 }
 
+// 予定取得リクエスト
 func NewScheduleTargeter(tokenChn <-chan string) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
 		target := ScheduleTargeter{
@@ -23,6 +24,7 @@ func NewScheduleTargeter(tokenChn <-chan string) vegeta.Targeter {
 			},
 		}
 
+		// JWTトークン受け取り
 		token, ok := <-tokenChn
 		if !ok {
 			return vegeta.ErrNoTargets
@@ -32,6 +34,7 @@ func NewScheduleTargeter(tokenChn <-chan string) vegeta.Targeter {
 		tgt.URL = target.URL
 		tgt.Header = target.Header
 		if val := token; ok {
+			// Authorizationヘッダーに入れる
 			tgt.Header["Authorization"] = []string{fmt.Sprintf("Bearer %s", val)}
 		}
 
