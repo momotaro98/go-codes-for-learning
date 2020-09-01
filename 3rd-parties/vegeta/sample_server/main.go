@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -12,7 +13,9 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/login", login)
 	r.HandleFunc("/schedule", profile)
-	log.Fatal(http.ListenAndServe(":8090", r))
+	port := 8090
+	log.Println("listening port:", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), r))
 }
 
 type LoginForm struct {

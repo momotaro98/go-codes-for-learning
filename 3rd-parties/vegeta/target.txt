@@ -1,18 +1,7 @@
-POST http://localhost:18000/v2/students/login
+POST http://localhost:8090/login
 Content-Type: application/json
-X-Api-Key: WV5CZjAjH75R3CdVO5zHIIyWguPWKtZ1UycVGsN9
-X-Transaction-ID: performance-2020-06-23_01
 @login.json
 
-GET http://localhost:18000/v2/students/student/1000020/profile
+GET http://localhost:8090/schedule
 Content-Type: application/json
-X-Api-Key: WV5CZjAjH75R3CdVO5zHIIyWguPWKtZ1UycVGsN9
-X-Transaction-ID: performance-2020-06-23_01
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTI5NjczOTMsImlhdCI6MTU5Mjg4MDk5MywicHJvZHVjdF9pZCI6IjAwMiIsImFjdG9yX3VzZXJfY2F0ZWdvcnlfaWQiOiIwMSIsImFjdG9yX3VzZXJfZ3JvdXBfaWQiOiIwMSIsImFjdG9yX3VzZXJfaWQiOiIxMDAwMDIwIn0.xlMrpI74QTUH_S5ysKHFVnauXUGvN92-zR-e3NXociU
-
-GET http://localhost:18000/v2/students/me
-Content-Type: application/json
-X-Api-Key: WV5CZjAjH75R3CdVO5zHIIyWguPWKtZ1UycVGsN9
-X-Transaction-ID: performance-2020-06-23_01
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTI5NjczOTMsImlhdCI6MTU5Mjg4MDk5MywicHJvZHVjdF9pZCI6IjAwMiIsImFjdG9yX3VzZXJfY2F0ZWdvcnlfaWQiOiIwMSIsImFjdG9yX3VzZXJfZ3JvdXBfaWQiOiIwMSIsImFjdG9yX3VzZXJfaWQiOiIxMDAwMDIwIn0.xlMrpI74QTUH_S5ysKHFVnauXUGvN92-zR-e3NXociU
-
+Authorization: Bearer xxxxx.yyyyy.zzzzz
