@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"unsafe"
 )
 
 type TokenType string
@@ -254,21 +255,35 @@ func (p *Parser) Num() (Node, error) {
 // Eval
 
 func Eval(ast Node) int64 {
-	switch node := ast.(type) {
-	case *IntegerLiteral:
-		return node.Value
-	case *InfixExpression:
-		left := Eval(node.Left)
-		right := Eval(node.Right)
-		switch node.Operator {
-		case "+":
-			return left + right
-		case "-":
-			return left - right
-		case "*":
-			return left * right
-		case "/":
-			return left / right
+	var useCompiler bool = true
+
+	if useCompiler {
+		compiler := NewCompiler()
+		compiler.GenCode(ast)
+		// fmt.Println("compiler.mmapFunc:", compiler.mmapFunc)
+
+		type execFunc func() uint
+		unsafeFunc := (uintptr)(unsafe.Pointer(&compiler.mmapFunc))
+		f := *(*execFunc)(unsafe.Pointer(&unsafeFunc))
+		value := f()
+		return int64(value)
+	} else {
+		switch node := ast.(type) {
+		case *IntegerLiteral:
+			return node.Value
+		case *InfixExpression:
+			left := Eval(node.Left)
+			right := Eval(node.Right)
+			switch node.Operator {
+			case "+":
+				return left + right
+			case "-":
+				return left - right
+			case "*":
+				return left * right
+			case "/":
+				return left / right
+			}
 		}
 	}
 	return 0

@@ -22,7 +22,6 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		line := scanner.Text()
-		fmt.Println(line)
 		l := calculator.NewLexer(line)
 		p := calculator.NewParser(l)
 
