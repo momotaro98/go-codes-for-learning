@@ -178,18 +178,16 @@ func (p *Parser) AddOrSub() (Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("AddOrSub 1st p.MulOrDiv, left:", left, "p.curToken.Type:", p.curToken.Type)
+loop:
 	for p.curToken.Type != EOF {
 		switch p.curToken.Type {
 		case PLUS, MINUS:
 			token := p.curToken
 			p.nextToken()
-			fmt.Println("AddOrSub after nextToken, left:", left, "p.curToken.Type:", p.curToken.Type)
 			right, err := p.MulOrDiv()
 			if err != nil {
 				return nil, err
 			}
-			fmt.Println("AddOrSub 2nd p.MulOrDiv, right:", right, "p.curToken.Type:", p.curToken.Type)
 			node := &InfixExpression{
 				Token:    token,
 				Left:     left,
@@ -198,7 +196,7 @@ func (p *Parser) AddOrSub() (Node, error) {
 			}
 			left = node
 		default:
-			break
+			break loop
 		}
 	}
 	return left, nil
@@ -209,7 +207,6 @@ func (p *Parser) MulOrDiv() (Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("MulOrDiv 1st p.Num, left:", left, "p.curToken.Type:", p.curToken.Type)
 loop:
 	for p.curToken.Type != EOF {
 		switch p.curToken.Type {
@@ -220,7 +217,6 @@ loop:
 			if err != nil {
 				return nil, err
 			}
-			fmt.Println("MulOrDiv 2nd p.Num, right:", right, "p.curToken.Type:", p.curToken.Type)
 			node := &InfixExpression{
 				Token:    token,
 				Left:     left,
@@ -229,7 +225,6 @@ loop:
 			}
 			left = node
 		default:
-			fmt.Println("MulOrDiv default")
 			break loop
 		}
 	}
@@ -237,7 +232,6 @@ loop:
 }
 
 func (p *Parser) Num() (Node, error) {
-	fmt.Println("Num of p.curToken.Type:", p.curToken.Type)
 	if p.curToken.Type == INT {
 		token := p.curToken
 		p.nextToken()
@@ -254,5 +248,28 @@ func (p *Parser) Num() (Node, error) {
 
 		return node, nil
 	}
-	return nil, fmt.Errorf("error!")
+	return nil, fmt.Errorf("error in Num()")
+}
+
+// Eval
+
+func Eval(ast Node) int64 {
+	switch node := ast.(type) {
+	case *IntegerLiteral:
+		return node.Value
+	case *InfixExpression:
+		left := Eval(node.Left)
+		right := Eval(node.Right)
+		switch node.Operator {
+		case "+":
+			return left + right
+		case "-":
+			return left - right
+		case "*":
+			return left * right
+		case "/":
+			return left / right
+		}
+	}
+	return 0
 }

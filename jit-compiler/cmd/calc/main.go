@@ -32,13 +32,8 @@ func Start(in io.Reader, out io.Writer) {
 		}
 		fmt.Println("ast:", ast)
 
-		/*
-			evaluated := evaluator.Eval(program, env)
-			if evaluated != nil {
-				io.WriteString(out, evaluated.Inspect())
-				io.WriteString(out, "\n")
-			}
-		*/
+		evaluated := calculator.Eval(ast)
+		fmt.Println(evaluated)
 	}
 }
 
