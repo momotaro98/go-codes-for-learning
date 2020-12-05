@@ -1,0 +1,1 @@
+char* rustaceanize(char *name);
