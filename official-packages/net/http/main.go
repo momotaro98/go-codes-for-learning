@@ -16,7 +16,34 @@ func hello(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "hello\n")
 }
 
+type Router struct {
+	PathFuncMap map[string]func(http.ResponseWriter, *http.Request)
+}
+
+func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	// set middle-ware
+
+	// match path
+	var handler http.Handler
+	for p, f := range r.PathFuncMap {
+		fmt.Println(req.URL.Path)
+		if p == req.URL.Path {
+			handler = http.HandlerFunc(f)
+		}
+	}
+	if handler == nil {
+		handler = http.NotFoundHandler()
+	}
+
+	// serve http
+	handler.ServeHTTP(w, req)
+}
+
 func main() {
-	http.HandleFunc("/hello", hello)
-	http.ListenAndServe(":8090", nil)
+	r := &Router{
+		PathFuncMap: make(map[string]func(http.ResponseWriter, *http.Request)),
+	}
+	r.PathFuncMap["/hello"] = hello
+
+	http.ListenAndServe(":8090", r)
 }
