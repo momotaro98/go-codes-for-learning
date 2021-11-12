@@ -1,13 +1,13 @@
 package main
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
 // アプリケーションHTTPサーバ
 func hello(w http.ResponseWriter, r *http.Request) {
-	b, _ := ioutil.ReadAll(r.Body)
+	b, _ := io.ReadAll(r.Body)
 	if string(b) != `{"a": "b"}` {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"res": "No hello"}`))

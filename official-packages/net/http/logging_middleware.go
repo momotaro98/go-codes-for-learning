@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 )
@@ -28,9 +27,9 @@ func (w *interceptWriter) WriteHeader(statusCode int) {
 // ロギング用ミドルウェア
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bufOfRequestBody, _ := ioutil.ReadAll(r.Body)
+		bufOfRequestBody, _ := io.ReadAll(r.Body)
 		// [For Request Body] 消費されてしまったRequest Bodyを修復する
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(bufOfRequestBody))
+		r.Body = io.NopCloser(bytes.NewBuffer(bufOfRequestBody))
 
 		// [For Response Body] ResponseWriterへ割り込む (interceptする)
 		iw := &interceptWriter{
