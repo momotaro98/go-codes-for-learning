@@ -21,6 +21,7 @@ func main() {
 	// 自作ルータをセット
 	r := &Router{}
 	r.HandleFunc("/hello", hello)
+	r.AddMiddleware(LoggingMiddleware)
 
 	http.ListenAndServe(":8090", r)
 }
