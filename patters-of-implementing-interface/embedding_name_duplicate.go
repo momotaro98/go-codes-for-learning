@@ -17,9 +17,9 @@ type ShinJinrui4 struct {
 	*dolphin
 }
 
-// ShinJinrui4は自分の能力だけでもDiveできる
+// ShinJinrui4はdolphinの能力の発動に加えて自身の能力を発動できる。
 func (sj *ShinJinrui4) Dive() string {
-	return "ShinJinrui Dive!"
+	return sj.dolphin.Dive() + " and ShinJinrui Dive!"
 }
 
 // ShinJinrui5 はdolphinの能力を借りるし

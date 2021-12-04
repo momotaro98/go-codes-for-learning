@@ -33,6 +33,10 @@ func hello(w http.ResponseWriter, req *http.Request) {
 // }
 
 func main() {
-	http.HandleFunc("/hello", hello)
-	http.ListenAndServe(":8090", nil)
+	// 自作ルータをセット
+	r := &Router{}
+	r.HandleFunc("/hello", hello)
+	r.AddMiddleware(LoggingMiddleware)
+
+	http.ListenAndServe(":8090", r)
 }
