@@ -7,7 +7,7 @@ import (
 func f() int {
 	var i int = 1
 	var a interface{}
-	a = &i
+	a = &i // 値コピーされない
 	i++
 	return *a.(*int) // return 2
 }
@@ -15,7 +15,7 @@ func f() int {
 func g() int {
 	var i int = 1
 	var a interface{}
-	a = i
+	a = i // 値コピーされる
 	i++
 	return a.(int) // return 1
 }
