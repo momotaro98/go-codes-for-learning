@@ -10,5 +10,5 @@ require (
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/streadway/quantile v0.0.0-20150917103942-b0c588724d25 // indirect
 	github.com/tsenart/vegeta v12.7.0+incompatible
-	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 )
